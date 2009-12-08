@@ -2,42 +2,50 @@
 #define AI_PRIORITIES
 #include "AIPriorities.h"
 #include <sstream>
-// TODO: No using namespace!!
-using namespace geniusai;
 
+using std::vector;
+using std::string;
+using std::cout;
+using std::endl;
+
+namespace geniusai {
 Network::Network()
 {}
+
+// TODO: No magic numbers ala 0.601, 0.251, etc.
 Network::Network(vector<unsigned int> whichFeatures)// random network
     : net(whichFeatures.size(),
-          whichFeatures.size() * 0.601 + 2,
-          whichFeatures.size() * 0.251 + 2,
+          whichFeatures.size()*0.601 + 2,
+          whichFeatures.size()*0.251 + 2,
           1),
       whichFeatures(whichFeatures)
-{
-}
+{}
 
-Network::Network(istream & input)
+Network::Network(std::istream& input)
 {
 	// vector<int> whichFeatures;
 	int feature;
 	string line;
-	getline(input,line);
-	stringstream lineIn(line);
+	std::getline(input,line);
+	std::stringstream lineIn(line);
 	while(lineIn>>feature)
 		whichFeatures.push_back(feature);
 
-	getline(input, line);//get R
+	std::getline(input, line);//get R
 	net = neuralNetwork(whichFeatures.size(),
                       whichFeatures.size() * 0.601 + 2,
                       whichFeatures.size() * 0.251 + 2,
                       1);
 }
 
+Network::~Network()
+{}
 
-float Network::feedForward(const vector<float> & stateFeatures)
+float Network::feedForward(const vector<float>& stateFeatures)
 {
   // TODO: Should comment/rewrite it...
 	return (rand() % 1000) / 800.0f;
+	/*
 	double * input = new double[whichFeatures.size()];
 	for (int i = 0; i < whichFeatures.size(); i++)
 		input[i] = stateFeatures[whichFeatures[i]];
@@ -46,66 +54,74 @@ float Network::feedForward(const vector<float> & stateFeatures)
 	
 	delete input;
 	return ans;
+	*/
 }
 
-Priorities::Priorities(const string & filename)	//read brain from file
-:numSpecialFeatures(8)
+// TODO: Magical numbers strike again!!
+// Read brain from file
+Priorities::Priorities(const std::string& filename) : numSpecialFeatures(8)
 {
-	ifstream infile(filename.c_str());
+	std::ifstream infile(filename.c_str());
 
 	// object_num [list of features]
 	// brain data or "R" for random brain
-	objectNetworks.resize(255);
-	buildingNetworks.resize(9);
+	object_networks_.resize(255);
+	building_networks_.resize(9);
 
 	char type;
 	int object_num;
 	int town_num;
 	int building_num;
-	while(infile>>type)
-	{
-		switch(type)
-		{
+	while (infile >> type) {
+		switch (type) {
 		case 'o'://map object
 			infile >> object_num;
-			objectNetworks[object_num].push_back(Network(infile));
+			object_networks_[object_num].push_back(Network(infile));
 			break;
 		case 't'://town building
 			infile >> town_num >> building_num;
-			buildingNetworks[town_num][building_num]=Network(infile);
-
+			building_networks_[town_num][building_num]=Network(infile);
 			break;
-		}
-	}
+    }
+  }
 }
 
-void Priorities::fillFeatures(const CGeniusAI::HypotheticalGameState & hgs)
+Priorities::~Priorities()
+{}
+
+void Priorities::fillFeatures(const CGeniusAI::HypotheticalGameState& hgs)
 {
 	stateFeatures.clear();
 	stateFeatures.resize(50);
 	for(int i = 0; i < stateFeatures.size(); i++)
-		stateFeatures[i]=0;
-	for(int i = 0; i < hgs.resourceAmounts.size();i++)	//features 0-7 are resources
-		stateFeatures[i]=hgs.resourceAmounts[i];
+		stateFeatures[i] = 0;
+	for(int i = 0; i < hgs.resourceAmounts.size(); i++)	//features 0-7 are resources
+		stateFeatures[i] = hgs.resourceAmounts[i];
 
-	//TODO:												//features 8-15 are incomes
-
-	specialFeaturesStart = 16;							//features 16-23 are special features (filled in by get functions before ANN)
+	// TODO: features 8-15 are incomes
+	specialFeaturesStart = 16;  //features 16-23 are special features (filled in by get functions before ANN)
 	
-	stateFeatures[24] = hgs.AI->m_cb->getDate();
+	stateFeatures[24] = hgs.AI->call_back_->getDate();
 	stateFeatures[25] = 1;
-	
-	
 }
 
-float Priorities::getCost(vector<int> &resourceCosts,const CGHeroInstance * moved,int distOutOfTheWay)
+// TODO: Replace those ints/floats with si16 etc.
+float Priorities::getCost(vector<int> &resourceCosts,
+  const CGHeroInstance* moved, int distOutOfTheWay)
 {
-	if(resourceCosts.size()==0)return -1;
-	//TODO: replace with ann
-	float cost = resourceCosts[0]/4.0+resourceCosts[1]/2.0+resourceCosts[2]/4.0+resourceCosts[3]/2.0+resourceCosts[4]/2.0+resourceCosts[5]/2.0+resourceCosts[6]/3000.0;
+	if (resourceCosts.size() == 0)
+	  return -1;
+	//TODO: replace with neural network, or at leastr
+	float cost = resourceCosts[0]/4.0 +
+	             resourceCosts[1]/2.0 +
+	             resourceCosts[2]/4.0 +
+	             resourceCosts[3]/2.0 +
+	             resourceCosts[4]/2.0 +
+	             resourceCosts[5]/2.0 +
+	             resourceCosts[6]/3000.0;
 	
-	if(moved!=NULL)						//TODO: multiply by importance of hero
-		cost+=distOutOfTheWay/10000.0;
+	if (moved != NULL)						//TODO: multiply by importance of hero
+		cost += distOutOfTheWay/10000.0;
 	return cost;
 }
 
@@ -114,20 +130,22 @@ float Priorities::getValue(const CGeniusAI::AIObjective & obj)
 	
 	vector<int> resourceAmounts(8,0);
 	int amount;
-
-	if(obj.type==CGeniusAI::AIObjective::finishTurn)	//TODO: replace with value of visiting that object divided by days till completed
+	
+	//TODO: replace with value of visiting that object divided by days till completed
+	if (obj.type == CGeniusAI::AIObjective::finishTurn)
 		return .0001;			//small nonzero
 	float a;
-	if(obj.type==CGeniusAI::AIObjective::attack)
+	if (obj.type == CGeniusAI::AIObjective::attack)
 		return 100;
-	if(dynamic_cast<const CGeniusAI::HeroObjective* >(&obj))
-	{
-		const CGeniusAI::HeroObjective* hobj = dynamic_cast<const CGeniusAI::HeroObjective* >(&obj);
+	if (dynamic_cast<const CGeniusAI::HeroObjective* >(&obj)) {
+		const CGeniusAI::HeroObjective* hobj =
+		    dynamic_cast<const CGeniusAI::HeroObjective* >(&obj);
 		stateFeatures[16] = hobj->whoCanAchieve.front()->h->getTotalStrength();
 		if(dynamic_cast<const CArmedInstance*>(hobj->object))
-			stateFeatures[17] = dynamic_cast<const CArmedInstance*>(hobj->object)->getArmyStrength();
-		switch(hobj->object->ID)
-		{
+			stateFeatures[17] =
+			    dynamic_cast<const CArmedInstance*>(hobj->object)->getArmyStrength();
+			    
+		switch(hobj->object->ID) {
 		case 5: //artifact //TODO: return value of each artifact
 			return 0;
 		case 79://resources on the ground
@@ -169,29 +187,31 @@ float Priorities::getValue(const CGeniusAI::AIObjective & obj)
 			//TODO: add features for hero's spell points
 			break;
 		case 34: //hero
-			if(dynamic_cast<const CGHeroInstance*>(hobj->object)->getOwner()==obj.AI->m_cb->getMyColor())//friendly hero
+			if(dynamic_cast<const CGHeroInstance*>(hobj->object)->getOwner()==obj.AI->call_back_->getMyColor())//friendly hero
 			{
 				
 				stateFeatures[17] = dynamic_cast<const CGHeroInstance*>(hobj->object)->getTotalStrength();
-				return objectNetworks[34][0].feedForward(stateFeatures);
+				return object_networks_[34][0].feedForward(stateFeatures);
 			}
 			else
 			{
 				stateFeatures[17] = dynamic_cast<const CGHeroInstance*>(hobj->object)->getTotalStrength();
-				return objectNetworks[34][1].feedForward(stateFeatures);
+				return object_networks_[34][1].feedForward(stateFeatures);
 			}
 
 			break;
 		case 98:
-			if(dynamic_cast<const CGTownInstance*>(hobj->object)->getOwner()==obj.AI->m_cb->getMyColor())//friendly town
+			if(dynamic_cast<const CGTownInstance*>(hobj->object)->getOwner()==obj.AI->call_back_->getMyColor())//friendly town
 			{
-				stateFeatures[17] = dynamic_cast<const CGTownInstance*>(hobj->object)->getArmyStrength();
-				return 0; // objectNetworks[98][0].feedForward(stateFeatures);
+				stateFeatures[17] =
+				    dynamic_cast<const CGTownInstance*>(hobj->object)->getArmyStrength();
+				return 0; // object_networks_[98][0].feedForward(stateFeatures);
 			}
 			else
 			{
-				stateFeatures[17] = dynamic_cast<const CGTownInstance*>(hobj->object)->getArmyStrength();
-				return 0; //objectNetworks[98][1].feedForward(stateFeatures);
+				stateFeatures[17] =
+				    dynamic_cast<const CGTownInstance*>(hobj->object)->getArmyStrength();
+				return 0; //object_networks_[98][1].feedForward(stateFeatures);
 			}
 
 			break;
@@ -207,14 +227,14 @@ float Priorities::getValue(const CGeniusAI::AIObjective & obj)
 			return 0;
 		case 53:	//various mines
 			return 0; //out of range crash
-			//objectNetworks[53][hobj->object->subID].feedForward(stateFeatures);
+			//object_networks_[53][hobj->object->subID].feedForward(stateFeatures);
 		case 113://TODO: replace with value of skill for the hero
 			return 0;
 		case 103:case 58://TODO: replace with value of seeing x number of new tiles 
 			return 0;
 		default:
-			if(objectNetworks[hobj->object->ID].size()!=0)
-				return objectNetworks[hobj->object->ID][0].feedForward(stateFeatures);
+			if(object_networks_[hobj->object->ID].size()!=0)
+				return object_networks_[hobj->object->ID][0].feedForward(stateFeatures);
 			cout << "don't know the value of ";
 			switch(obj.type)
 			{
@@ -236,8 +256,8 @@ float Priorities::getValue(const CGeniusAI::AIObjective & obj)
 		if(obj.type == CGeniusAI::AIObjective::buildBuilding)
 		{
 			const CGeniusAI::TownObjective* tnObj = dynamic_cast<const CGeniusAI::TownObjective* >(&obj);
-			if(buildingNetworks[tnObj->whichTown->t->subID].find(tnObj->which)!=buildingNetworks[tnObj->whichTown->t->subID].end())
-				return buildingNetworks[tnObj->whichTown->t->subID][tnObj->which].feedForward(stateFeatures);
+			if(building_networks_[tnObj->whichTown->t->subID].find(tnObj->which)!=building_networks_[tnObj->whichTown->t->subID].end())
+				return building_networks_[tnObj->whichTown->t->subID][tnObj->which].feedForward(stateFeatures);
 			else
 			{
 				cout << "don't know the value of ";
@@ -247,8 +267,7 @@ float Priorities::getValue(const CGeniusAI::AIObjective & obj)
 
 		}
 	}
-
-
 	return 0;
+}
 }
 #endif

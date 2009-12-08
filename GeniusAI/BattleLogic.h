@@ -1,25 +1,21 @@
-#ifndef __BATTLE_LOGIC_H__
-#define __BATTLE_LOGIC_H__
+#ifndef BATTLE_LOGIC_H
+#define BATTLE_LOGIC_H
 
 #include "Common.h"
 #include "BattleHelper.h"
 
-#pragma warning (disable: 4100 4251 4245 4018 4081)
-#include "../../global.h"
-#include "../../CCallback.h"
-#include "../../hch/CCreatureHandler.h"
-#include "../../hch/CObjectHandler.h"
-#pragma warning (default: 4100 4251 4245 4018 4081)
+#pragma warning(push, 0)
+#include "global.h"
+#include "CCallback.h"
+#include "CCreatureHandler.h"
+#include "CObjectHandler.h"
+#pragma warning(pop)
 
-#pragma warning (disable: 4100)
-
-using namespace std;
-
-namespace geniusai { namespace BattleAI {
-
-/**
- * Class is responsible for making decision during the battle.
- */
+namespace geniusai {
+namespace battleai {
+//*****************************************************************************
+//* Class is responsible for making decision during the battle.               *
+//*****************************************************************************
 class CBattleLogic
 {
 private:
@@ -63,7 +59,8 @@ private:
 		int leftHitPoint_for_min; // scenario
 	};
 public:
-	CBattleLogic(ICallback *cb, CCreatureSet *army1, CCreatureSet *army2, int3 tile, CGHeroInstance *hero1, CGHeroInstance *hero2, bool side);
+	CBattleLogic(ICallback *cb, CCreatureSet *army1, CCreatureSet *army2, int3 tile,
+	    CGHeroInstance *hero1, CGHeroInstance *hero2, bool side);
 	~CBattleLogic();
 
 	void SetCurrentTurn(int turn);
@@ -76,19 +73,19 @@ private:
 	//BattleInfo m_battleInfo;
 	int m_iCurrentTurn;
 	bool m_bIsAttacker;
-	ICallback *m_cb;
-	CCreatureSet *m_army1;
-	CCreatureSet *m_army2;
-	int3 m_tile;
-	CGHeroInstance *m_hero1;
-	CGHeroInstance *m_hero2;
+	ICallback       *m_cb;
+	CCreatureSet    *m_army1;
+	CCreatureSet    *m_army2;
+	int3            m_tile;
+	CGHeroInstance  *m_hero1;
+	CGHeroInstance  *m_hero2;
 	bool m_side;
 
-	// statistics
-	typedef std::vector<std::pair<int, int> > creature_stat; // first - creature id, second - value
+	// Statistics.
+	// First - creature id, second - value.
+	typedef std::vector<std::pair<int, int> > creature_stat;
 	creature_stat m_statMaxDamage;
 	creature_stat m_statMinDamage;
-	//
 	creature_stat m_statMaxSpeed;
 	creature_stat m_statDistance;
 	creature_stat m_statDistanceFromShooters;
@@ -124,13 +121,13 @@ private:
 	 * Return vector wiht IDs of creatures to attack,
 	 * additional info: -2 means wait, -1 - defend, 0 - make attack
 	 */
-	list<int> PerformBerserkAttack(int stackID, int &additionalInfo);
+	std::list<int> PerformBerserkAttack(int stackID, int &additionalInfo);
 	/**
 	 * Normal mode - equilibrium between casualties and yields.
 	 * Return vector wiht IDs of creatures to attack,
 	 * additional info: -2 means wait, -1 - defend, 0 - make attack
 	 */
-	list<int> PerformDefaultAction(int stackID, int &additionalInfo);
+	std::list<int> PerformDefaultAction(int stackID, int &additionalInfo);
 	/**
 	 * Only for debug purpose.
 	 */

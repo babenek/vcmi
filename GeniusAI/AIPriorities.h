@@ -1,39 +1,48 @@
-#ifndef AIP_H
-#define AIP_H
+#ifndef AI_Priorities_H
+#define AI_Priorities_H
 
+#pragma warning(push, 0)
 #include <string>
+#pragma warning(pop)
+
 #include "CGeniusAI.h"
 #include "neuralNetwork.h"
 
-namespace geniusai {
+// TODO: * no public variables
+//       * definition of destructs
 
+namespace geniusai {
 class Network
 {
 public:
 	Network();
-	Network(vector<unsigned int> whichFeatures);// random network
-	Network(istream & input);
-	vector<unsigned int> whichFeatures;
-	float feedForward(const vector<float> & stateFeatures);
-	neuralNetwork net;					//a network with whichFeatures.size() inputs, and 1 output
+	Network(std::vector<unsigned int> whichFeatures);// random network
+	Network(std::istream& input);
+	~Network();
+	
+	float feedForward(const std::vector<float>& stateFeatures);
+	
+	std::vector<unsigned int> whichFeatures;
+	neuralNetwork net; // A network with whichFeatures.size() inputs and 1 output.
 };
-
 
 class Priorities
 {
 public:
-	Priorities(const string & filename);	//read brain from file
+	Priorities(const std::string& filename);	//read brain from file
+	~Priorities();
+	
+  void fillFeatures(const CGeniusAI::HypotheticalGameState& AI);
+  float getValue(const CGeniusAI::AIObjective& obj);
+  float getCost(std::vector<int>& resourceCosts, const CGHeroInstance* moved,
+      int distOutOfTheWay);
 
-
-	vector<float> stateFeatures;
 	int specialFeaturesStart;
 	int numSpecialFeatures;
-	void fillFeatures(const CGeniusAI::HypotheticalGameState & AI);
-	float getValue(const CGeniusAI::AIObjective & obj);
-	float getCost(vector<int> &resourceCosts,const CGHeroInstance * moved,int distOutOfTheWay);
-	vector<vector<Network> > objectNetworks;
-	vector<map<int,Network> > buildingNetworks;
+	std::vector<float>                    stateFeatures;
+	std::vector< std::vector<Network> >   object_networks_;
+	std::vector< std::map<int, Network> > building_networks_;
 };
 
 }
-#endif
+#endif // AI_Priorities_H

@@ -1,10 +1,13 @@
 #include "GeneralAI.h"
-#include "../../CCallback.h"
 
-using namespace geniusai::GeneralAI;
+#pragma warning(push, 0)
+#include "CCallback.h"
+#pragma warning(pop)
 
+namespace geniusai {
+namespace generalai {
 CGeneralAI::CGeneralAI()
-	: m_cb(NULL)
+	: call_back_(NULL)
 {
 }
 
@@ -12,9 +15,10 @@ CGeneralAI::~CGeneralAI()
 {
 }
 
-void CGeneralAI::init(ICallback *CB)
+void CGeneralAI::init(ICallback* call_back)
 {
-	assert(CB != NULL);
-	m_cb = CB;
-	CB->waitTillRealize = true;
+	assert(call_back != NULL);
+	call_back_ = call_back;
+	call_back->waitTillRealize = true;
 }
+}}

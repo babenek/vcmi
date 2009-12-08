@@ -1,11 +1,11 @@
-#ifndef __BATTLE_HELPER__
-#define __BATTLE_HELPER__
+#ifndef BATTLE_HELPER_H
+#define BATTLE_HELPER_H
 
 #include "Common.h"
 
-namespace geniusai { namespace BattleAI {
-
-	class CBattleHelper
+namespace geniusai {
+namespace battleai {
+class CBattleHelper
 {
 public:
 	CBattleHelper();
@@ -17,29 +17,29 @@ public:
 
 	int GetShortestDistance(int pointA, int pointB);
 	int GetDistanceWithObstacles(int pointA, int pointB);
-
-	int GetVoteForMaxDamage() const { return m_voteForMaxDamage; }
-	int GetVoteForMinDamage() const { return m_voteForMinDamage; }
-	int GetVoteForMaxSpeed() const { return m_voteForMaxSpeed; }
-	int GetVoteForDistance() const { return m_voteForDistance; }
-	int GetVoteForDistanceFromShooters() const { return m_voteForDistanceFromShooters; }
-	int GetVoteForHitPoints() const { return m_voteForHitPoints; }
+	
+	// TODO: Definitions always into the .cpp file.
+	int GetVoteForMaxDamage() const { return voteForMaxDamage_; }
+	int GetVoteForMinDamage() const { return voteForMinDamage_; }
+	int GetVoteForMaxSpeed() const { return voteForMaxSpeed_; }
+	int GetVoteForDistance() const { return voteForDistance_; }
+	int GetVoteForDistanceFromShooters() const { return voteForDistanceFromShooters_; }
+	int GetVoteForHitPoints() const { return voteForHitPoints_; }
 
 	const int InfiniteDistance;
 	const int BattlefieldWidth;
 	const int BattlefieldHeight;
 private:
-	int m_voteForMaxDamage;
-	int m_voteForMinDamage;
-	int m_voteForMaxSpeed;
-	int m_voteForDistance;
-	int m_voteForDistanceFromShooters;
-	int m_voteForHitPoints;
+	int voteForMaxDamage_;
+	int voteForMinDamage_;
+	int voteForMaxSpeed_;
+	int voteForDistance_;
+	int voteForDistanceFromShooters_;
+	int voteForHitPoints_;
 
 	CBattleHelper(const CBattleHelper &);
-	CBattleHelper &operator=(const CBattleHelper &);
+	CBattleHelper& operator=(const CBattleHelper &);
 };
-
 }}
 
-#endif/*__BATTLE_HELPER__*/
+#endif // BATTLE_HELPER_H

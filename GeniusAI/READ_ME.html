@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<title>VCMI - GeniusAI - Coding standards</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="generator" content="C++2HTML by Jasper Bedaux" />
+<style type="text/css">
+	body {
+		font-family: Verdana, Arial;
+		font-size: 13px }
+    em {
+        font-weight: italics; }
+	#rules ol {
+        margin: 1em 2em 1em 0; }
+	#rules ol li {
+		border-style: dashed;
+		border-bottom-style: none;
+		border-width: 1px;
+		list-style-position: inside;
+		font-size: 14px;
+        font-weight: bold;
+        color: black;
+		magin: 0;
+		padding: 0.75em 0.5em;
+        background: white;}
+	#rules ol li.last {
+		border-bottom-style: dashed; }
+	.good_habbit {
+		font-size: 14px;
+		font-family: Consolas, Courier, "Courier New";
+        font-weight: normal;
+		background: PaleGreen;
+		margin: 0.5em 1em 0 1em;
+        padding: 0.25em;
+        color: black;}
+	.bad_habbit {
+		font-size: 14px;
+		font-family: Consolas, Courier, "Courier New";
+        font-weight: normal;
+		background: Salmon;
+		margin: 0 1em 0.5em 1em;
+        padding: 0.25em;
+        color: black;}
+	.explanation {
+		font-size: 12px;
+        font-weight: normal;
+		margin: 0.5em 1em 0 1em;
+		padding: 0;}
+	</style>
+</head>
+<body>
+<h1>Introduction</h1>
+
+<h3>What is this document?</h3>
+<p>This document describes the coding standards of AI part of VCMI project. 
+It consists of style guidelines that you should remember while developing 
+the AI code of VCMI project.</p>
+
+<h3>Who are you?</h3>
+<p>My name is Bartosz Bielecki (aka Red1939). At the moment I am the only
+person maintaining the AI code. I haven't written the code that you see now,
+though; you could say I've taken the responsibility for it. Previously
+I tried to patch the code a little bit, but due to lack of time and
+commitment, I became inactive for a long period of time. Now, I hope, I will
+have much more time to work on it.</p>
+
+<h3>Why this document?</h3>
+<p>In Open Source projects people come and go, but the code is always there 
+- stored in the SVN. I believe, that in order to keep the project running,
+there have to be some rules, which everyone should adhere to. Total freedom =
+total chaos, and that is the best way to make a code which no one wants to 
+maintain.<br />
+I created a road-map describing how (I would like) to develop the AI:
+<ol>
+	<li>Refactor the code.</li>
+	<li>Finish as many 'TODOs' as possible (preferrably leave out the parts that
+	need most attention - i.e., large unfinished parts).</li>
+	<li>Create UML diagrams for the present system.</li>
+	<li>Finish the AI (finish the large missing parts of code).</li>
+	<li>Add new features (xml-based configuration files, exposure to Python, and
+	what not).</li>
+</ol>
+It's high time I answered the question! Basically, I want all the people who will
+ever play around with the AI code, to observe the rules stated here, so that the
+code will be as nice to read & maintain, as possible.
+</p>
+
+<h3>YOUR rules are stupid, I have a better idea how to write a code!</h3>
+<p>In normal companies there is always some higher-up who will state the rules 
+and tell you what to do. Unfortunatelly, Open Source projects don't have this 
+luxury, at least most of them. I am not saying that my rules are the best, but 
+I've read not one "Coding style" which described similar rules, and basing on my 
+experience - they work. Of course, if you have some ideas regarding the coding 
+style, feel free to <a href="mailto:bielecki.b@gmail.com">contact me</a>.</p>
+
+<div id="rules">
+<h1>Rules</h1>
+<ol>	
+	<li>Variables start with lowercase letter and are seperated using "_" (
+    underscore).
+	<p class="good_habbit">enemies, shortest_path, objects_in_range, ai</p>
+    <p class="bad_habbit">Enemies, shortestPath, o, AI</p>
+	<p class="explanation">This rule is an opposite to methods naming convention.
+    We want to see difference between variables and functions right away. That
+    is why we use underscores and we don't capitalize the first letter. It's
+    recommended to use max 3-part names, as longer names clobber the screen
+    too much. That said, remember that the more info you provide, the better,
+    thus longer meaningfull names are preferred to short and meaningless. Don't
+    abbreviate the names, unless it's <em>perfectly</em> clear what does a
+    specific abbreviation mean (i.e., everyone should be familiar what does AI
+    stand for).</p>
+	</li>
+    
+    <li>Don't use the <dfn title="'Literal prefixes' in front
+	of variables which describe their type: constant, boolean, C-type string,
+	integer etc.">hungarian notation</dfn>.
+	<p class="good_habbit">file_name, is_allowed, colors</p>
+	<p class="bad_habbit">szFileName, bAllowed, aulColors</p>
+	<p class="explanation">
+	At first it seems helpful to know (right away) what is the type of a
+	variable, just by looking at it's name. Eventually, however, g_szXxxx & Co.
+	become tedious to read and understand (you know what does the aulColor mean?).
+	Variable's name should describe it's function, not it's internal
+	representation. In nowadays IDEs it's very easy to check the type of
+	variables (hovering your mouse pointer over it, or pressing a simple 
+	keyboard short-cut; not mentioning an ability to see all the variables in 
+	outlines).</p></li>
+    
+    <li>Names of functions start with a lower-case letter and are separated using
+    first letter capitalization.
+	<p class="good_habbit">searchForEnemies, calculatePath, searchAndDestroy</p>
+	<p class="bad_habbit">SearchForEnemies, calculate_path, SAD</p>
+	<p class="explanation">As we don't use underscores, the names of methods
+    can be little longer (hence we don't have to be so careful about length). I
+    will repeat once more though: meaningful name is <em>much</em> more important
+    than a short, abbreviated and meaningless poo of letters.</p>
+	</li>
+    
+    <li>Class variables should be private.
+	<p class="good_habbit">private:<br />
+    &nbsp;&nbsp;int number_of_enemies_;</p>
+	<p class="bad_habbit">public:<br />
+    &nbsp;&nbsp;int number_of_enemies_</p>
+	<p class="explanation">This is one of the most important concepts of OO
+    programming and still too many people put variables wherever they want. With
+    variables placed in the <code>private</code> section we can fully control
+    access to those variables by writing "get"/"set" functions or not. Also every
+    change done to our variables (by "set" method) can be monitored. Second,
+    we learn what to show, and what not to show to the outside world, and most
+    of the time variables shouldn't be exposed. Of course there are situations
+    where you want some variables to be exposed, but you should limit such
+    situations. Don't also forget about 'friendly' classes/functions. While such
+    solutions may cause harm, it's better to allow one or two specific functions
+    or classes to access our variables (or methods), than to make them public.</p>
+	</li>
+    
+    <li>
+	<p class="good_habbit">Good</p>
+	<p class="bad_habbit">Bad</p>
+	<p class="explanation"></p>
+	</li>
+    
+    <li>
+	<p class="good_habbit">Good</p>
+	<p class="bad_habbit">Bad</p>
+	<p class="explanation"></p>
+	</li>
+    
+    <li class="last">
+	<p class="good_habbit">Good</p>
+	<p class="bad_habbit">Bad</p>
+	<p class="explanation"></p>
+	</li>
+</ol>
+</div>
+</body>
+</html>

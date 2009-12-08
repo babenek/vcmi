@@ -1,12 +1,15 @@
-#pragma warning (disable: 4100 4251 4245 4018 4081)
-#include "../../AI_Base.h"
-#pragma warning (default: 4100 4251 4245 4018 4081)
+#pragma warning(push, 0)
+#include "AI_Base.h"
+#pragma warning(pop)
 
 #include "CGeniusAI.h"
 
+// Using namespace not suggested.
 using namespace geniusai;
 
-const char *g_cszAiName = "Genius 1.0";
+// TODO: Why do we have to make a global variable? Can't we put it simply to
+//       GeniusAI, as a private variable?
+const char *ai_name = "Genius 1.0";
 
 extern "C" DLL_F_EXPORT int GetGlobalAiVersion()
 {
@@ -15,7 +18,7 @@ extern "C" DLL_F_EXPORT int GetGlobalAiVersion()
 
 extern "C" DLL_F_EXPORT void GetAiName(char* name)
 {
-	strcpy_s(name, strlen(g_cszAiName) + 1, g_cszAiName);
+	strcpy_s(name, strlen(ai_name) + 1, ai_name);
 }
 
 extern "C" DLL_F_EXPORT char* GetAiNameS()

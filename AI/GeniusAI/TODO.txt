@@ -1,0 +1,8 @@
+1. Decompose the CGeniusAI into several files (with classes/structures/etc.).
+2. Check whether or not, the part can be made more independent (by loosening 
+the connections between them).
+3. Finish/double check the int->si16 conversions (and similar).
+4. Finish cleaning up the style of the code (alignment, braces, etc.).
+5. Create additional define USE_PCH, in case someone doesn't like macros.
+6. Clear/update the StdAfx & Common.h.
+7. Substitute the hand-written loops by foreach-s.

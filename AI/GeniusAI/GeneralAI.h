@@ -1,21 +1,20 @@
-#ifndef __GENERAL_AI_H__
-#define __GENERAL_AI_H__
+#ifndef GENERAL_AI_H
+#define GENERAL_AI_H
 
 #include "Common.h"
 
-namespace geniusai { namespace GeneralAI {
+namespace geniusai {
+namespace generalai {
 
-	class CGeneralAI
-	{
-	public:
-		CGeneralAI();
-		~CGeneralAI();
+class CGeneralAI {
+public:
+	CGeneralAI();
+	~CGeneralAI();
 
-		void init(ICallback* CB);
-	private:
-		ICallback *m_cb;
-	};
+	void init(ICallback* call_back);
+private:
+	ICallback* call_back_;
+};
 
 }}
-
-#endif/*__GENERAL_AI_H__*/
+#endif // GENERAL_AI_H

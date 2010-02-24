@@ -1,39 +1,49 @@
-#ifndef AIP_H
-#define AIP_H
+#ifndef AI_PRIORITIES_H
+#define AI_PRIORITIES_H
 
-#include <string>
-#include "CGeniusAI.h"
 #include "neuralNetwork.h"
 
-namespace geniusai {
+#include <vector>
+#include <sstream>
+#include <string>
+#include <map>
 
-class Network
-{
+// TODO: * no public variables
+//       * definition of dctor
+
+namespace geniusai {
+class HypotheticalGameState;
+class AIObjective;
+
+class Network {
 public:
 	Network();
-	Network(vector<unsigned int> whichFeatures);// random network
-	Network(istream & input);
-	vector<unsigned int> whichFeatures;
-	float feedForward(const vector<float> & stateFeatures);
-	neuralNetwork net;					//a network with whichFeatures.size() inputs, and 1 output
+	Network(std::vector<ui16> whichFeatures);// random network
+	Network(std::istream& input);
+	~Network();
+	
+	float feedForward(const std::vector<float>& stateFeatures);
+	
+	std::vector<ui16> whichFeatures;
+	neuralNetwork net; // A network with whichFeatures.size() inputs and 1 output.
 };
 
-
-class Priorities
-{
+class Priorities {
 public:
-	Priorities(const string & filename);	//read brain from file
+	Priorities(const std::string& filename);	// Read brain from file.
+	~Priorities();
+	
+  void fillFeatures(const HypotheticalGameState& AI);
+  float getValue(const AIObjective& obj);
+  float getCost(std::vector<si16>& resourceCosts, const CGHeroInstance* moved,
+                si16 distOutOfTheWay);
 
-
-	vector<float> stateFeatures;
-	int specialFeaturesStart;
-	int numSpecialFeatures;
-	void fillFeatures(const CGeniusAI::HypotheticalGameState & AI);
-	float getValue(const CGeniusAI::AIObjective & obj);
-	float getCost(vector<int> &resourceCosts,const CGHeroInstance * moved,int distOutOfTheWay);
-	vector<vector<Network> > objectNetworks;
-	vector<map<int,Network> > buildingNetworks;
+	si16 specialFeaturesStart;
+	si16 numSpecialFeatures;
+	std::vector<float> state_features_;
+	std::vector< std::vector<Network> > object_networks_;
+	std::vector< std::map<si16, Network> > building_networks_;
 };
 
 }
-#endif
+#endif // AI_PRIORITIES_H

@@ -1,35 +1,44 @@
-#pragma warning (disable: 4100 4251 4245 4018 4081)
+// ****************************************************************************
+// DLLMain.cpp
+// ----------------------------------------------------------------------------
+// Functions that are to be exposed in the GeniusAI.dll library.
+// ****************************************************************************
+#include "StdAfx.h"
+#include "Common.h"
 #include "../../AI_Base.h"
-#pragma warning (default: 4100 4251 4245 4018 4081)
-
 #include "CGeniusAI.h"
 
-using namespace geniusai;
+// TODO: Remake it, so such global-namespace values are better ordered.
+namespace geniusai {
+  const char *AI_NAME = "Genius 1.0";
+}
 
-const char *g_cszAiName = "Genius 1.0";
-
-extern "C" DLL_F_EXPORT int GetGlobalAiVersion()
+// Returns the version of GlobalAI.
+extern "C" DLL_F_EXPORT si16 GetGlobalAiVersion()
 {
 	return AI_INTERFACE_VER;
 }
 
+// Copies the C-string with the version of AI into the argument.
 extern "C" DLL_F_EXPORT void GetAiName(char* name)
 {
-	strcpy_s(name, strlen(g_cszAiName) + 1, g_cszAiName);
+	strcpy_s(name, strlen(geniusai::AI_NAME) + 1, geniusai::AI_NAME);
 }
 
-extern "C" DLL_F_EXPORT char* GetAiNameS()
+// Returns a string with the version of AI.
+extern "C" DLL_F_EXPORT std::string GetAiNameString(void)
 {
-	// need to be defined
-	return NULL;
+	return std::string(geniusai::AI_NAME);
 }
 
-extern "C" DLL_F_EXPORT CGlobalAI* GetNewAI()
+// Creates an instance of GeniusAI.
+extern "C" DLL_F_EXPORT ::CGlobalAI* GetNewAI()
 {
-	return new CGeniusAI();
+	return new geniusai::CGeniusAI();
 }
 
-extern "C" DLL_F_EXPORT void ReleaseAI(CGlobalAI* i)
+// Destroys an instance of GeniusAI.
+extern "C" DLL_F_EXPORT void ReleaseAI(::CGlobalAI* i)
 {
-	delete (CGeniusAI*)i;
+	delete (geniusai::CGeniusAI*)i;
 }

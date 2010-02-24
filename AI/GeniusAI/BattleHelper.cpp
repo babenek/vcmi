@@ -1,101 +1,86 @@
+#include "StdAfx.h"
 #include "BattleHelper.h"
-#include <vector>
-#include <string>
-#include <fstream>
+
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-using namespace geniusai::BattleAI;
+// TODO: No clobbering the file with the WHOLE std...
+
+using namespace geniusai::battleai;
 using namespace std;
+using std::string;
+using std::fstream;
+using boost::lexical_cast;
 
-
+// TODO: More magical numbers...
 CBattleHelper::CBattleHelper():
 	InfiniteDistance(0xffff),
 	BattlefieldWidth(15),
 	BattlefieldHeight(11),
-	m_voteForMaxDamage(10),
-	m_voteForMinDamage(10),
-	m_voteForMaxSpeed(10),
-	m_voteForDistance(10),
-	m_voteForDistanceFromShooters(20),
-	m_voteForHitPoints(10)
+	voteForMaxDamage_(10),
+	voteForMinDamage_(10),
+	voteForMaxSpeed_(10),
+	voteForDistance_(10),
+	voteForDistanceFromShooters_(20),
+	voteForHitPoints_(10)
 {
 	// loads votes
-	std::fstream f;
+	fstream f;
 	f.open("AI\\CBattleHelper.txt", std::ios::in);
-	if (f)
-	{
+	if (f) {
 		//char c_line[512];
-		std::string line;
-		while (std::getline(f, line, '\n'))
-		{
+		string line;
+		while (std::getline(f, line, '\n')) {
 			//f.getline(c_line, sizeof(c_line), '\n');
 			//std::string line(c_line);
 			//std::getline(f, line);
-			std::vector<std::string> parts;
+			std::vector<string> parts;
 			boost::algorithm::split(parts, line, boost::algorithm::is_any_of("="));
-			if (parts.size() >= 2)
-			{
+			if (parts.size() >= 2) {
 				boost::algorithm::trim(parts[0]);
 				boost::algorithm::trim(parts[1]);
-				if (parts[0].compare("m_voteForDistance") == 0)
-				{
-					try
-					{
-						m_voteForDistance = boost::lexical_cast<int>(parts[1]);
+				if (parts[0].compare("voteForDistance_") == 0) {
+					try {
+						voteForDistance_ = lexical_cast<si16>(parts[1]);
+					}
+					catch (boost::bad_lexical_cast &)
+					{}
+				} else if (parts[0].compare("voteForDistanceFromShooters_") == 0) {
+					try {
+						voteForDistanceFromShooters_ = lexical_cast<si16>(parts[1]);
+					}
+					catch (boost::bad_lexical_cast &)
+					{}
+				} else if (parts[0].compare("voteForHitPoints_") == 0) {
+				  try {
+						voteForHitPoints_ = lexical_cast<si16>(parts[1]);
+					}
+					catch (boost::bad_lexical_cast &)
+					{}
+				} else if (parts[0].compare("voteForMaxDamage_") == 0) {
+					try {
+						voteForMaxDamage_ = lexical_cast<si16>(parts[1]);
+					}
+					catch (boost::bad_lexical_cast &)
+					{}
+				} else if (parts[0].compare("voteForMaxSpeed_") == 0) {
+					try {
+						voteForMaxSpeed_ = lexical_cast<si16>(parts[1]);
 					}
 					catch (boost::bad_lexical_cast &)
 					{}
 				}
-				else if (parts[0].compare("m_voteForDistanceFromShooters") == 0)
-				{
-					try
-					{
-						m_voteForDistanceFromShooters = boost::lexical_cast<int>(parts[1]);
+				else if (parts[0].compare("voteForMinDamage_") == 0) {
+					try {
+						voteForMinDamage_ = lexical_cast<si16>(parts[1]);
 					}
 					catch (boost::bad_lexical_cast &)
 					{}
-				}
-				else if (parts[0].compare("m_voteForHitPoints") == 0)
-				{
-					try
-					{
-						m_voteForHitPoints = boost::lexical_cast<int>(parts[1]);
-					}
-					catch (boost::bad_lexical_cast &)
-					{}
-				}
-				else if (parts[0].compare("m_voteForMaxDamage") == 0)
-				{
-					try
-					{
-						m_voteForMaxDamage = boost::lexical_cast<int>(parts[1]);
-					}
-					catch (boost::bad_lexical_cast &)
-					{}
-				}
-				else if (parts[0].compare("m_voteForMaxSpeed") == 0)
-				{
-					try
-					{
-						m_voteForMaxSpeed = boost::lexical_cast<int>(parts[1]);
-					}
-					catch (boost::bad_lexical_cast &)
-					{}
-				}
-				else if (parts[0].compare("m_voteForMinDamage") == 0)
-				{
-					try
-					{
-						m_voteForMinDamage = boost::lexical_cast<int>(parts[1]);
-					}
-					catch (boost::bad_lexical_cast &)
-					{}
-				}
-			}
-		}
+				} // if (parts.size() >= 2) 
+			}   // while (std::getline(f, line, '\n'))
+		}     // if (f)
 		f.close();
 	}
 }
@@ -103,49 +88,48 @@ CBattleHelper::CBattleHelper():
 CBattleHelper::~CBattleHelper()
 {}
 
-int CBattleHelper::GetBattleFieldPosition(int x, int y)
+si16 CBattleHelper::GetBattleFieldPosition(si16 x, si16 y)
 {
-	return x + 17 * (y - 1);
+	return x + 17*(y - 1);
 }
 
-int CBattleHelper::DecodeXPosition(int battleFieldPosition)
+si16 CBattleHelper::DecodeXPosition(si16 battleFieldPosition)
 {
-	int pos = battleFieldPosition - (DecodeYPosition(battleFieldPosition) - 1) * 17;
+	si16 pos = battleFieldPosition - (DecodeYPosition(battleFieldPosition) - 1)*17;
 	assert(pos > 0 && pos < 16);
 	return pos;
 }
 
-int CBattleHelper::DecodeYPosition(int battleFieldPosition)
+si16 CBattleHelper::DecodeYPosition(si16 battleFieldPosition)
 {
 	double y = (double)battleFieldPosition / 17.0;
-	if (y - (int)y > 0.0)
-	{
-		return (int)y + 1;
-	}
-	assert((int)y > 0 && (int)y <= 11);
-	return (int)y;
+	if (y - (si16)y > 0.0)
+		return (si16)y + 1;
+		
+	assert((si16)y > 0 && (si16)y <= 11);
+	return (si16)y;
 }
 
 
-int CBattleHelper::GetShortestDistance(int pointA, int pointB)
+si16 CBattleHelper::GetShortestDistance(si16 pointA, si16 pointB)
 {
 	/**
 	 * TODO: function hasn't been checked!
 	 */
-	int x1 = DecodeXPosition(pointA);
-	int y1 = DecodeYPosition(pointA);
+	si16 x1 = DecodeXPosition(pointA);
+	si16 y1 = DecodeYPosition(pointA);
 	//
-	int x2 = DecodeXPosition(pointB);
+	si16 x2 = DecodeXPosition(pointB);
 	//x2 += (x2 % 2)? 0 : 1;
-	int y2 = DecodeYPosition(pointB);
+	si16 y2 = DecodeYPosition(pointB);
 	//
 	double dx = x1 - x2;
 	double dy = y1 - y2;
 
-	return (int)sqrt(dx * dx + dy * dy);
+	return (si16)sqrt(dx * dx + dy * dy);
 }
 
-int CBattleHelper::GetDistanceWithObstacles(int pointA, int pointB)
+si16 CBattleHelper::GetDistanceWithObstacles(si16 pointA, si16 pointB)
 {
 	// TODO - implement this!
 	return GetShortestDistance(pointA, pointB);

@@ -255,7 +255,8 @@ struct DLL_EXPORT Mapa : public CMapHeader
 	std::vector<CGHeroInstance*> heroes;
 	std::vector<CGTownInstance*> towns;
 	std::vector<IModableArt *> artInstances; //stores single scrolls
-	std::map<ui16, CGCreature*> monsters;
+
+	std::map<ui16, CGCreature*> monsters; ///hold info about quest objectives
 	std::map<ui16, CGHeroInstance*> heroesToBeat;
 
 	void initFromBytes( const unsigned char * bufor); //creates map from decompressed .h3m data

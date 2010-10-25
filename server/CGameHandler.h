@@ -128,7 +128,8 @@ public:
 	void levelUpHero(int ID, int skill);//handle client respond and send one more request if needed 
 	void levelUpHero(int ID);//initial call - check if hero have remaining levelups & handle them
 	void changePrimSkill(int ID, int which, si64 val, bool abs=false);
-	void changeSecSkill(int ID, int which, int val, bool abs=false); 
+	void changeSecSkill(int ID, int which, int val, bool abs=false);
+	expType changeExp(int ID, expType val, bool abs=false);
 	void showInfoDialog(InfoWindow *iw);
 	void showBlockingDialog(BlockingDialog *iw, const CFunctionList<void(ui32)> &callback);
 	ui32 showBlockingDialog(BlockingDialog *iw); //synchronous version of above

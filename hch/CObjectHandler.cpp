@@ -1216,6 +1216,8 @@ void CGHeroInstance::updateSkill(int which, int val)
 			break;
 		case 2: //Logistics
 			skillVal = 10 * val; break;
+		case 3: //Scouting //New!
+			skillVal = val; break;
 		case 5: //Navigation
 			skillVal = 50 * val; break;
 		case 8: //Mysticism
@@ -1224,6 +1226,8 @@ void CGHeroInstance::updateSkill(int which, int val)
 			skillVal = 30 + 10 * val; break;
 		case 12: //Necromancy
 			skillVal = 10 * val; break;
+		case 21: //Learning //New!
+			skillVal = 5 * val; break;
 		case 22: //Offense
 			skillVal = 10 * val; break;
 		case 23: //Armorer
@@ -2513,7 +2517,7 @@ void CGVisitableOPH::onNAHeroVisit(int heroID, bool alreadyVisited) const
 		case 100: //give exp
 			{
 				const CGHeroInstance *h = cb->getHero(heroID);
-				val = val*(100+h->getSecSkillLevel(21)*5)/100.0f;
+				val = cb->changeExp(heroID, val, false);
 				InfoWindow iw;
 				iw.soundID = sound;
 				iw.components.push_back(Component(id,subid,val,0));
@@ -2521,7 +2525,6 @@ void CGVisitableOPH::onNAHeroVisit(int heroID, bool alreadyVisited) const
 				iw.text << std::pair<ui8,ui32>(11,ot);
 				iw.soundID = soundBase::gazebo;
 				cb->showInfoDialog(&iw);
-				cb->changePrimSkill(heroID,4,val);
 				break;
 			}
 		case 102://tree
@@ -3881,7 +3884,7 @@ void CGPickable::chosen( int which, int heroID ) const
 		cb->giveResource(cb->getOwner(heroID),6,val1);
 		break;
 	case 2: //player pick exp
-		cb->changePrimSkill(heroID, 4, val2*(100+h->getSecSkillLevel(21)*5)/100.0f);
+		cb->changeExp(heroID, val1, false);
 		break;
 	default:
 		throw std::string("Unhandled treasure choice");
@@ -4416,8 +4419,7 @@ void CGSeerHut::completeQuest (const CGHeroInstance * h) const //reward
 	{
 		case 1: //experience
 		{
-			int expVal = rVal*(100+h->getSecSkillLevel(21)*5)/100.0f;
-			cb->changePrimSkill(h->id, 4, expVal, false);
+			cb->changeExp(h->id, rVal, false);
 			break;
 		}
 		case 2: //mana points
@@ -4885,7 +4887,7 @@ void CGPandoraBox::giveContents( const CGHeroInstance *h, bool afterBattle ) con
 
 		//give exp
 		if(expVal)
-			cb->changePrimSkill(h->id,4,expVal,false);
+			cb->changeExp(h->id, expVal, false);
 		//give prim skills
 		for(int i=0; i<primskills.size(); i++)
 			if(primskills[i])
@@ -6559,6 +6561,16 @@ void CArmedInstance::randomizeArmy(int type)
 		assert(j->second.armyObj == this);
 	}
 	return;
+}
+
+void CArmedInstance::changeStackExp(expType exp)
+{
+	ui32 tempExp;
+	for (TSlots::iterator i = slots.begin(); i != slots.end(); i++)
+	{ //exp for stack is not grater than ui32
+		i->second.experience += std::min((ui32)exp, i->second.type->maxExp * MAX_EXP_CHANGE / 100);
+		amin (i->second.experience, i->second.type->maxExp);
+	}
 }
 
 void CArmedInstance::getParents(TCNodes &out, const CBonusSystemNode *root /*= NULL*/) const

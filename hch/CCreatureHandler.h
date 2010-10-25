@@ -43,6 +43,7 @@ public:
 	si32 idNumber;
 	si8 faction; //-1 = neutral
 	ui8 doubleWide;
+	ui32 maxExp; //fixed for certain creature type
 
 	///animation info
 	float timeBetweenFidgets, walkAnimationTime, attackAnimationTime, flightAnimationDistance;

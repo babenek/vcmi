@@ -46,7 +46,7 @@ public:
 
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
-		h & static_cast<CBonusSystemNode&>(*this);;
+		h & static_cast<CBonusSystemNode&>(*this);
 		h & name & description & price & possibleSlots & constituents & constituentOf & aClass & id;
 	}
 

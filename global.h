@@ -108,6 +108,8 @@ const int CREEP_SIZE = 2000000000;
 const int WEEKLY_GROWTH = 10; //percent
 const int AVAILABLE_HEROES_PER_PLAYER = 2;
 const bool DWELLINGS_ACCUMULATE_CREATURES = true;
+const bool STACK_EXPERIENCE = false;
+const int MAX_EXP_CHANGE = 30;
 
 const int BFIELD_WIDTH = 17;
 const int BFIELD_HEIGHT = 11;

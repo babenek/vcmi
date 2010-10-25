@@ -225,6 +225,7 @@ public:
 	void setArmy(const CCreatureSet &src);
 	CCreatureSet getArmy() const;
 	void randomizeArmy(int type);
+	void changeStackExp(expType exp);
 
 	//////////////////////////////////////////////////////////////////////////
 	void getParents(TCNodes &out, const CBonusSystemNode *root = NULL) const;

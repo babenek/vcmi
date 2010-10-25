@@ -211,7 +211,7 @@ void CGameHandler::levelUpHero(int ID)
 		if(r<pom)
 			break;
 	}
-	tlog5 << "Bohater dostaje umiejetnosc pierwszorzedna " << x << " (wynik losowania "<<r<<")"<<std::endl; 
+	tlog5 << "Hero gets primary skill " << x << " (drawn "<<r<<")"<<std::endl; 
 	SetPrimSkill sps;
 	sps.id = ID;
 	sps.which = x;
@@ -308,6 +308,24 @@ void CGameHandler::changeSecSkill( int ID, int which, int val, bool abs/*=false*
 		if(h && h->visitedTown)
 			giveSpells(h->visitedTown, h);
 	}
+}
+
+expType CGameHandler::changeExp(int ID, expType val, bool abs/*=false*/)
+{
+	const CGHeroInstance *h = getHero(ID);
+	if (h)
+	{
+		SetPrimSkill sps;
+		sps.id = ID;
+		sps.abs = abs;
+		sps.val = val * (100 + h->valOfBonuses(Bonus::SECONDARY_SKILL_PREMY, 21))/100.0f;
+		//TODO: Stack experience
+		//TODO: Commander
+		sendAndApply(&sps);
+		levelUpHero(ID);
+		return sps.val;
+	}
+	return 0;
 }
 
 static CCreatureSet takeCasualties(int color, const CCreatureSet &set, BattleInfo *bat)
@@ -596,10 +614,6 @@ void CGameHandler::endBattle(int3 tile, const CGHeroInstance *hero1, const CGHer
 
 	//end battle, remove all info, free memory
 	giveExp(*battleResult.data);
-	if (hero1)
-		battleResult.data->exp[0] *= (100+hero1->getSecSkillLevel(21)*5)/100.0f;//sholar skill
-	if (hero2)
-		battleResult.data->exp[1] *= (100+hero2->getSecSkillLevel(21)*5)/100.0f;
 	sendAndApply(battleResult.data);
 
 	//if one hero has lost we will erase him
@@ -616,9 +630,9 @@ void CGameHandler::endBattle(int3 tile, const CGHeroInstance *hero1, const CGHer
 
 	//give exp
 	if(battleResult.data->exp[0] && hero1)
-		changePrimSkill(hero1->id,4,battleResult.data->exp[0]);
+		changeExp(hero1->id, battleResult.data->exp[0], false);
 	if(battleResult.data->exp[1] && hero2)
-		changePrimSkill(hero2->id,4,battleResult.data->exp[1]);
+		changeExp(hero2->id, battleResult.data->exp[1], false);
 
 	sendAndApply(&resultsApplied);
 
@@ -5293,8 +5307,7 @@ bool CGameHandler::sacrificeCreatures(const IMarket *market, const CGHeroInstanc
 	int dump, exp;
 	market->getOffer(crid, 0, dump, exp, CREATURE_EXP);
 	exp *= count;
-	changePrimSkill	(hero->id, 4, exp*(100+hero->getSecSkillLevel(21)*5)/100.0f);
-
+	changeExp(hero->id, exp, false);
 	return true;
 }
 

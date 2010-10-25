@@ -71,6 +71,11 @@ DLL_EXPORT void SetPrimSkill::applyGs( CGameState *gs )
 			hero->exp = val;
 		else
 			hero->exp += val;
+
+		if (STACK_EXPERIENCE)
+		{
+			hero->changeStackExp(val);
+		}
 	}
 }
 
@@ -754,7 +759,6 @@ DLL_EXPORT void HeroLevelUp::applyGs( CGameState *gs )
 {
 	CGHeroInstance* h = gs->getHero(heroid);
 	h->level = level;
-	//speciality
 	h->UpdateSpeciality();
 }
 

@@ -79,7 +79,8 @@ public:
 	virtual void setHoverName(int objid, MetaString * name)=0;
 	virtual void setObjProperty(int objid, int prop, si64 val)=0;
 	virtual void changePrimSkill(int ID, int which, si64 val, bool abs=false)=0;
-	virtual void changeSecSkill(int ID, int which, int val, bool abs=false)=0; 
+	virtual void changeSecSkill(int ID, int which, int val, bool abs=false)=0;
+	virtual expType changeExp(int ID, expType val, bool abs=false){return 0;}; //calculates amount of received exp after all bonuses
 	virtual void showInfoDialog(InfoWindow *iw)=0;
 	virtual void showBlockingDialog(BlockingDialog *iw, const CFunctionList<void(ui32)> &callback)=0;
 	virtual ui32 showBlockingDialog(BlockingDialog *iw) =0; //synchronous version of above //TODO:

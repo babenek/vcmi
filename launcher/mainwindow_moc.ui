@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>icons:menu-game.png</normaloff>icons:menu-game.png</iconset>
+    <normaloff>:/icons/menu-game.png</normaloff>:/icons/menu-game.png</iconset>
   </property>
   <property name="iconSize">
    <size>
@@ -105,7 +105,7 @@
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>icons:menu-mods.png</normaloff>icons:menu-mods.png</iconset>
+         <normaloff>:/icons/menu-mods.png</normaloff>:/icons/menu-mods.png</iconset>
        </property>
       </item>
       <item>
@@ -114,7 +114,7 @@
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>icons:menu-settings.png</normaloff>icons:menu-settings.png</iconset>
+         <normaloff>:/icons/menu-settings.png</normaloff>:/icons/menu-settings.png</iconset>
        </property>
       </item>
      </widget>
@@ -126,7 +126,7 @@
       </property>
       <property name="icon">
        <iconset>
-        <normaloff>icons:menu-game.png</normaloff>icons:menu-game.png</iconset>
+        <normaloff>:/icons/menu-game.png</normaloff>:/icons/menu-game.png</iconset>
       </property>
       <property name="iconSize">
        <size>

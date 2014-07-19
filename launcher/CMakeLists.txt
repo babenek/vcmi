@@ -34,6 +34,10 @@ set(launcher_FORMS
 	mainwindow_moc.ui
 )
 
+set(launcher_RESOURCES
+	resources.qrc
+)
+
 # Tell CMake to run moc when necessary:
 set(CMAKE_AUTOMOC ON)
 
@@ -50,12 +54,13 @@ add_definitions(${Qt5Network_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} ${CMAKE_CXX_FLAGS}")
 
 qt5_wrap_ui(launcher_UI_HEADERS ${launcher_FORMS})
+qt5_add_resources(laucher_RESOURCES_BUILD ${launcher_RESOURCES})
 
 if(WIN32)
-	add_executable(vcmilauncher WIN32 ${launcher_SRCS} ${launcher_UI_HEADERS} VCMI_launcher.mingw.rc)
+	add_executable(vcmilauncher WIN32 ${launcher_SRCS} ${launcher_UI_HEADERS} VCMI_launcher.mingw.rc ${laucher_RESOURCES_BUILD})
 	set_target_properties(vcmilauncher PROPERTIES OUTPUT_NAME VCMI_launcher)
 else()
-	add_executable(vcmilauncher ${launcher_SRCS} ${launcher_UI_HEADERS})
+	add_executable(vcmilauncher ${launcher_SRCS} ${launcher_UI_HEADERS} ${laucher_RESOURCES_BUILD})
 endif()
 
 # The Qt5Widgets_LIBRARIES variable also includes QtGui and QtCore
@@ -67,7 +72,5 @@ target_link_libraries(vcmilauncher vcmi ${Qt5Widgets_LIBRARIES} ${Qt5Network_LIB
 
 if (NOT APPLE) # Already inside bundle
 	install(TARGETS vcmilauncher DESTINATION ${BIN_DIR})
-	# copy whole directory but .svn control files
-	install(DIRECTORY icons DESTINATION ${DATA_DIR}/launcher PATTERN ".svn" EXCLUDE)
 endif()
 
